@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Operations</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f8f8f8; /* Off-white background color */
+        color: #333; /* Text color */
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+  
+      h1 {
+        color: #ff8c00; /* Orange header color */
+      }
+  
+      h2 {
+        color: #333; /* Dark text color */
+      }
+  
+      form {
+        background-color: #fff; /* White form background color */
+        padding: 20px;
+        margin: 10px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+  
+      label {
+        display: block;
+        margin-bottom: 8px;
+      }
+  
+      input, checkbox {
+        margin-bottom: 16px;
+        padding: 8px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+  
+      button {
+        background-color: #ff8c00; /* Orange button color */
+        color: #fff; /* White text color */
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+  
+      button:hover {
+        background-color: #e07b00; /* Darker orange on hover */
+      }
+  
+      #itemsList {
+        margin-top: 20px;
+      }
+  
+      #itemsList div {
+        background-color: #fff;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>>
+</head>
+<body>
+  <h1>CRUD Operations</h1>
+
+  <h2>Create Item</h2>
+  <form id="createForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" required>
+
+    <label for="tech">Tech:</label>
+    <input type="text" id="tech" required>
+
+    <label for="sub">Subscribed:</label>
+    <input type="checkbox" id="sub">
+
+    <button type="button" onclick="createItem()">Create Item</button>
+  </form>
+
+  <h2>Items List</h2>
+  <div id="itemsList"></div>
+
+  <h2>Update Item</h2>
+  <form id="updateForm">
+    <label for="updateId">ID:</label>
+    <input type="text" id="updateId" required>
+
+    <label for="updateName">Name:</label>
+    <input type="text" id="updateName" required>
+
+    <label for="updateTech">Tech:</label>
+    <input type="text" id="updateTech" required>
+
+    <label for="updateSub">Subscribed:</label>
+    <input type="checkbox" id="updateSub">
+
+    <button type="button" onclick="updateItem()">Update Item</button>
+  </form>
+
+  <h2>Delete Item</h2>
+  <form id="deleteForm">
+    <label for="deleteId">ID:</label>
+    <input type="text" id="deleteId" required>
+
+    <button type="button" onclick="deleteItem()">Delete Item</button>
+  </form>
+
+  <script>
+    async function getAllItems() {
+      const response = await fetch('http://localhost:9000/items');
+      const items = await response.json();
+
+      const itemsListDiv = document.getElementById('itemsList');
+      itemsListDiv.innerHTML = '';
+
+      items.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.innerHTML = `<p>ID: ${item._id}, Name: ${item.name}, Tech: ${item.tech}, Subscribed: ${item.sub}</p>`;
+        itemsListDiv.appendChild(itemDiv);
+      });
+    }
+
+    async function createItem() {
+  try {
+    const name = document.getElementById('name').value;
+    const tech = document.getElementById('tech').value;
+    const sub = document.getElementById('sub').checked;
+
+    console.log('Name:', name);
+    console.log('Tech:', tech);
+    console.log('Subscribed:', sub);
+
+    const response = await fetch('http://localhost:9000/items', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, tech, sub }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create item');
+    }
+
+    getAllItems();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+    async function updateItem() {
+      const id = document.getElementById('updateId').value;
+      const name = document.getElementById('updateName').value;
+      const tech = document.getElementById('updateTech').value;
+      const sub = document.getElementById('updateSub').checked;
+
+      await fetch(`http://localhost:9000/items/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, tech, sub }),
+      });
+
+      getAllItems();
+    }
+
+    async function deleteItem() {
+      const id = document.getElementById('deleteId').value;
+
+      await fetch(`http://localhost:9000/items/${id}`, {
+        method: 'DELETE',
+      });
+
+      getAllItems();
+    }
+
+    
+    getAllItems();
+  </script>
+</body>
+</html>
